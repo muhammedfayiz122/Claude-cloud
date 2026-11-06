@@ -1,0 +1,244 @@
+<title>CRM User Guide</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: product manual — sticky contents rail on the left, one reading column of annotated screenshots. */
+:root {
+  --bg: #f6f8fb; --surface: #ffffff; --ink: #172235; --muted: #5a6577; --line: #dde3ec;
+  --accent: #0b6bd6; --accent-soft: #e6f0fc; --mark: #f05a1a; --mark-ink: #ffffff;
+  --tip: #0f7a55; --tip-soft: #e5f5ee; --admin: #8a4b00; --admin-soft: #fbf0e1;
+  --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f141c; --surface: #161d28; --ink: #e5eaf2; --muted: #9aa5b6; --line: #2a3443;
+  --accent: #5ca4f5; --accent-soft: #17283d; --mark: #ff7a3d; --mark-ink: #1a0c04;
+  --tip: #5fd0a5; --tip-soft: #12291f; --admin: #f2b366; --admin-soft: #2c2010; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0f141c; --surface: #161d28; --ink: #e5eaf2; --muted: #9aa5b6; --line: #2a3443;
+  --accent: #5ca4f5; --accent-soft: #17283d; --mark: #ff7a3d; --mark-ink: #1a0c04;
+  --tip: #5fd0a5; --tip-soft: #12291f; --admin: #f2b366; --admin-soft: #2c2010; color-scheme: dark }
+
+* { box-sizing: border-box }
+html { scroll-behavior: smooth; scroll-padding-top: 24px }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto } }
+body { background: var(--bg); color: var(--ink); font: 17px/1.6 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)) }
+a { color: var(--accent) }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px }
+
+.wrap { max-width: 1240px; margin: 0 auto; display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 56px; padding-block: 48px 96px }
+header.cover { grid-column: 1 / -1; display: grid; gap: 12px; padding-bottom: 24px; border-bottom: 1px solid var(--line) }
+.cover .kicker { font: 500 12px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--accent) }
+h1 { font: 700 clamp(36px, 5vw, 56px)/1.05 var(--display); margin: 0; letter-spacing: -.02em; text-wrap: balance }
+.cover p { margin: 0; max-width: 62ch; color: var(--muted); font-size: 19px }
+.cover .meta { font: 500 12px/1.5 var(--mono); color: var(--muted) }
+
+nav.toc { position: sticky; top: calc(24px + env(safe-area-inset-top, 0px)); align-self: start; max-height: calc(100vh - 48px); overflow-y: auto }
+nav.toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px }
+nav.toc a { display: grid; gap: 1px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: var(--ink); font-weight: 600; font-size: 15px; line-height: 1.3 }
+nav.toc a span { font: 500 10.5px/1.2 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted) }
+nav.toc a:hover, nav.toc a.on { background: var(--accent-soft); color: var(--accent) }
+
+main { min-width: 0; display: grid; gap: 72px }
+section { min-width: 0; display: grid; gap: 18px; align-content: start }
+section > p, section > h3, dl, .steps { max-width: 68ch }
+.eyebrow { margin: 0; font: 500 12px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--accent) }
+h2 { font: 700 34px/1.1 var(--display); margin: -6px 0 4px; letter-spacing: -.015em; text-wrap: balance }
+h3 { font: 600 22px/1.25 var(--display); margin: 18px 0 0; text-wrap: balance }
+p { margin: 0 }
+em { font-style: normal; font-weight: 600 }
+kbd { font: 500 12.5px/1 var(--mono); padding: 3px 6px; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5px; background: var(--surface) }
+.ui { font-weight: 600; color: var(--accent); white-space: nowrap }
+
+figure { margin: 0; display: grid; gap: 10px; min-width: 0 }
+.frame { position: relative; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--surface); box-shadow: 0 1px 2px rgb(15 30 60 / .06), 0 8px 24px -12px rgb(15 30 60 / .18) }
+.frame img { display: block; width: 100%; height: auto }
+.hot { position: absolute; border: 2px solid var(--mark); border-radius: 7px; box-shadow: 0 0 0 3px rgb(240 90 26 / .18); pointer-events: none }
+.hot b { position: absolute; top: -11px; left: -11px; width: 22px; height: 22px; border-radius: 50%; background: var(--mark); color: var(--mark-ink); font: 600 12px/22px var(--mono); text-align: center; box-shadow: 0 1px 3px rgb(0 0 0 / .3) }
+figcaption { font-size: 15px; color: var(--muted); line-height: 1.45 }
+figcaption b { color: var(--ink) }
+.legend { list-style: none; margin: 4px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px 24px }
+.legend li { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px; font-size: 15.5px; line-height: 1.45 }
+.legend li > b { width: 22px; height: 22px; border-radius: 50%; background: var(--mark); color: var(--mark-ink); font: 600 12px/22px var(--mono); text-align: center; margin-top: 1px }
+
+.pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px }
+.gallery { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px }
+.gallery figcaption, .pair figcaption { font-size: 14.5px }
+
+.steps { margin: 0; padding: 0; list-style: none; counter-reset: s; display: grid; gap: 10px }
+.steps li { counter-increment: s; display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 12px }
+.steps li::before { content: counter(s); width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid var(--accent); color: var(--accent); font: 600 13px/25px var(--mono); text-align: center }
+
+.callout { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 14px; align-items: baseline; padding: 14px 18px; border-radius: 10px; background: var(--tip-soft); max-width: 76ch }
+.callout span { font: 500 11px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--tip) }
+.callout.note { background: var(--accent-soft) } .callout.note span { color: var(--accent) }
+.callout.admin { background: var(--admin-soft) } .callout.admin span { color: var(--admin) }
+.callout p { font-size: 16px }
+
+table { border-collapse: collapse; width: 100%; max-width: 760px; font-size: 16px }
+th, td { text-align: start; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top }
+th { font: 500 11px/1.2 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted) }
+td:last-child { color: var(--muted) }
+.faq { margin: 0; display: grid; gap: 6px }
+.faq dt { font-weight: 600; margin-top: 12px }
+.faq dd { margin: 0; color: var(--muted) }
+
+@media (max-width: 960px) {
+  .wrap { grid-template-columns: minmax(0, 1fr); gap: 32px; padding-block: 28px 64px }
+  nav.toc { position: static; max-height: none }
+  nav.toc ol { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)) }
+  .gallery { grid-template-columns: repeat(2, minmax(0, 1fr)) }
+}
+@media (max-width: 600px) {
+  body { font-size: 16px }
+  .pair, .gallery { grid-template-columns: minmax(0, 1fr) }
+  h2 { font-size: 28px }
+  .hot b { width: 18px; height: 18px; font-size: 10px; line-height: 18px; top: -9px; left: -9px }
+}
+</style>
+
+<div class="wrap">
+  <header class="cover">
+    <span class="kicker">User guide</span>
+    <h1>Using the CRM</h1>
+    <p>How to find your way around, capture and work leads, plan follow-ups, manage customers and deals, and read your numbers. Every screenshot comes from the application itself, and the orange numbers point to the controls described beneath each one.</p>
+    <span class="meta">Screens captured November 2026 from the current develop build with sample data. Your organisation’s fields, stages and sidebar may differ.</span>
+  </header>
+  <nav class="toc" aria-label="Contents"><ol><li><a href="#tour"><span>Start here</span>Find your way around</a></li><li><a href="#setup"><span>Administrators</span>First-time setup</a></li><li><a href="#leads"><span>Leads</span>Work your lead list</a></li><li><a href="#lead-record"><span>Leads</span>Inside a lead record</a></li><li><a href="#daily"><span>Your day</span>Follow-ups, My Work and the calendar</a></li><li><a href="#customers"><span>Customers</span>Accounts and contacts</a></li><li><a href="#sales"><span>Sales</span>Opportunities, proposals and approvals</a></li><li><a href="#insight"><span>Insight</span>Dashboards and reports</a></li><li><a href="#marketing"><span>Outreach</span>Segments, campaigns and imports</a></li><li><a href="#admin"><span>Administrators</span>Teams, queues and settings</a></li><li><a href="#help"><span>Reference</span>Common questions</a></li></ol></nav>
+  <main><section id="tour"><p class="eyebrow">Start here</p><h2>Find your way around</h2>
+<p>Every screen in the CRM shares the same frame. The sidebar on the left lists the workspaces you have
+access to, and the bar across the top holds search, the date, notifications and your account menu.
+Workspaces you don't have permission for are hidden, so your sidebar may be shorter than the one shown here.</p>
+<figure class="shot"><div class="frame"><img src="images/shell.jpg" alt="The application frame, shown on the Leads workspace." loading="lazy"><span class="hot" style="left:0.41%;top:6.66%;width:17.44%;height:6.24%"><b>1</b></span><span class="hot" style="left:18.74%;top:0.60%;width:28.07%;height:5.36%"><b>2</b></span><span class="hot" style="left:85.44%;top:0.82%;width:6.78%;height:4.91%"><b>3</b></span><span class="hot" style="left:91.11%;top:0.60%;width:3.62%;height:5.36%"><b>4</b></span><span class="hot" style="left:-0.15%;top:92.87%;width:18.00%;height:7.13%"><b>5</b></span><span class="hot" style="left:95.55%;top:93.76%;width:4.87%;height:5.36%"><b>6</b></span></div><figcaption>The application frame, shown on the Leads workspace.</figcaption><ol class="legend"><li><b>1</b><span><strong>Sidebar navigation</strong> — every workspace you can open. Hover an item and pin it to keep it at the top; the arrow at the top collapses the sidebar.</span></li><li><b>2</b><span><strong>Global search (Ctrl K)</strong> — find any record or jump to any screen from anywhere.</span></li><li><b>3</b><span><strong>Language switch</strong> — switches the interface language when your organisation offers more than one.</span></li><li><b>4</b><span><strong>Notifications</strong> — assignments, mentions, approvals and reminders addressed to you.</span></li><li><b>5</b><span><strong>Your account</strong> — organisation switcher, your profile and sign out.</span></li><li><b>6</b><span><strong>Assistant</strong> — ask the built-in assistant about your records.</span></li></ol></figure>
+<h3>Search and jump with <kbd>Ctrl</kbd> <kbd>K</kbd></h3>
+<p>Press <kbd>Ctrl</kbd> <kbd>K</kbd> (<kbd>⌘</kbd> <kbd>K</kbd> on a Mac) on any screen and start typing. Results are grouped
+into recently viewed items, records, actions you can take, things you can create, and screens you can go to.
+Use the arrow keys and <kbd>Enter</kbd> to open a result.</p>
+<figure class="shot"><div class="frame"><img src="images/command-palette.jpg" alt="Typing “Aisha” finds the lead and offers to open it." loading="lazy"></div><figcaption>Typing “Aisha” finds the lead and offers to open it.</figcaption></figure>
+</section><section id="setup"><p class="eyebrow">Administrators</p><h2>First-time setup</h2>
+<p>The first time an administrator opens a new organisation, the CRM walks them through six short steps.
+Each step is saved as you go, and everything you choose can be changed later in <span class="ui">Settings</span>.</p>
+<div class="gallery">
+<figure class="shot small"><div class="frame"><img src="images/setup-1.jpg" alt="&lt;b&gt;1 · Starting point.&lt;/b&gt; Pick a template close to how you work. Each shows how many teams, pipeline stages and services it creates." loading="lazy"></div><figcaption><b>1 · Starting point.</b> Pick a template close to how you work. Each shows how many teams, pipeline stages and services it creates.</figcaption></figure>
+<figure class="shot small"><div class="frame"><img src="images/setup-2.jpg" alt="&lt;b&gt;2 · Your teams.&lt;/b&gt; Name a department and the teams inside it. Add or remove teams freely." loading="lazy"></div><figcaption><b>2 · Your teams.</b> Name a department and the teams inside it. Add or remove teams freely.</figcaption></figure>
+<figure class="shot small"><div class="frame"><img src="images/setup-3.jpg" alt="&lt;b&gt;3 · Lead pipeline.&lt;/b&gt; The stages a lead moves through. Mark which end as won and which as lost." loading="lazy"></div><figcaption><b>3 · Lead pipeline.</b> The stages a lead moves through. Mark which end as won and which as lost.</figcaption></figure>
+<figure class="shot small"><div class="frame"><img src="images/setup-4.jpg" alt="&lt;b&gt;4 · Where new leads go.&lt;/b&gt; Name the fallback queue that catches any lead not assigned automatically." loading="lazy"></div><figcaption><b>4 · Where new leads go.</b> Name the fallback queue that catches any lead not assigned automatically.</figcaption></figure>
+<figure class="shot small"><div class="frame"><img src="images/setup-5.jpg" alt="&lt;b&gt;5 · Services you offer.&lt;/b&gt; Optional. Add your service catalogue now or choose &lt;i&gt;Skip for now&lt;/i&gt;." loading="lazy"></div><figcaption><b>5 · Services you offer.</b> Optional. Add your service catalogue now or choose <i>Skip for now</i>.</figcaption></figure>
+<figure class="shot small"><div class="frame"><img src="images/setup-6.jpg" alt="&lt;b&gt;6 · Ready to launch.&lt;/b&gt; Review the summary and choose &lt;i&gt;Launch CRM&lt;/i&gt;." loading="lazy"></div><figcaption><b>6 · Ready to launch.</b> Review the summary and choose <i>Launch CRM</i>.</figcaption></figure>
+</div>
+<aside class="callout admin"><span>Admins</span><p>If a step reports that it didn’t finish, some of it may already be saved. Read the summary on the last step before trying again, and contact support with the reference shown in the message if it repeats.</p></aside>
+</section><section id="leads"><p class="eyebrow">Leads</p><h2>Work your lead list</h2>
+<p>A <em>lead</em> is an enquiry from someone who might become a customer. The Leads workspace lists every
+lead you are allowed to see, newest activity first. The count above the table always comes from the server,
+so it reflects every matching lead, not only the rows on screen.</p>
+<figure class="shot"><div class="frame"><img src="images/leads-list.jpg" alt="The Leads list." loading="lazy"><span class="hot" style="left:21.31%;top:8.54%;width:15.98%;height:5.13%"><b>1</b></span><span class="hot" style="left:37.35%;top:8.43%;width:10.02%;height:5.36%"><b>2</b></span><span class="hot" style="left:47.09%;top:8.43%;width:9.10%;height:5.36%"><b>3</b></span><span class="hot" style="left:87.27%;top:8.43%;width:3.62%;height:5.36%"><b>4</b></span><span class="hot" style="left:90.04%;top:8.43%;width:6.21%;height:5.36%"><b>5</b></span><span class="hot" style="left:25.20%;top:24.33%;width:7.95%;height:4.13%"><b>6</b></span></div><figcaption>The Leads list.</figcaption><ol class="legend"><li><b>1</b><span><strong>Search leads</strong> — match on name, email or phone.</span></li><li><b>2</b><span><strong>Choose a view</strong> — switch between active, archived and all leads.</span></li><li><b>3</b><span><strong>Add filter</strong> — narrow by owner, source, stage, dates and any custom field.</span></li><li><b>4</b><span><strong>New Lead</strong> — open the new-lead form.</span></li><li><b>5</b><span><strong>Export</strong> — download the current view as a spreadsheet.</span></li><li><b>6</b><span><strong>Click a name to open the lead</strong> — opens the full lead record.</span></li></ol></figure>
+<div class="pair"><figure class="shot small"><div class="frame"><img src="images/leads-views.jpg" alt="The view menu: &lt;i&gt;Active&lt;/i&gt;, &lt;i&gt;Archived&lt;/i&gt; or &lt;i&gt;All&lt;/i&gt; leads." loading="lazy"></div><figcaption>The view menu: <i>Active</i>, <i>Archived</i> or <i>All</i> leads.</figcaption></figure><figure class="shot small"><div class="frame"><img src="images/pools.jpg" alt="&lt;b&gt;Lead pools&lt;/b&gt; let a team share incoming leads. Anyone in the team can claim one." loading="lazy"></div><figcaption><b>Lead pools</b> let a team share incoming leads. Anyone in the team can claim one.</figcaption></figure></div>
+
+<h3 id="create-lead">Create a lead</h3>
+<ol class="steps"><li>On the Leads screen choose the blue <span class="ui">+</span> button (<i>New Lead</i>).</li><li>Enter the person’s <b>Name</b>. It is the only required field.</li><li>Pick the <b>Source</b> so reports can show which channels bring in business.</li><li>Add an email and phone number. The phone field picks the country code from your organisation’s default.</li><li>Type anything you learned in <b>Note</b>; it becomes the first note on the record.</li><li>Leave <b>Stage</b> on <i>New</i> unless the lead has already been worked.</li><li>Leave <b>Assign to</b> on <i>Automated</i> to let your routing rules choose the owner, or pick a person to send it straight to them. Choose <span class="ui">Create lead</span>.</li></ol>
+<figure class="shot"><div class="frame"><img src="images/lead-new.jpg" alt="The New Lead panel, filled in." loading="lazy"><span class="hot" style="left:71.10%;top:14.21%;width:12.06%;height:6.02%"><b>1</b></span><span class="hot" style="left:84.61%;top:14.10%;width:14.42%;height:6.24%"><b>2</b></span><span class="hot" style="left:71.10%;top:26.16%;width:12.06%;height:6.02%"><b>3</b></span><span class="hot" style="left:69.92%;top:35.50%;width:29.11%;height:11.69%"><b>4</b></span><span class="hot" style="left:69.92%;top:55.11%;width:29.11%;height:5.36%"><b>5</b></span><span class="hot" style="left:69.92%;top:69.62%;width:29.11%;height:5.36%"><b>6</b></span><span class="hot" style="left:90.56%;top:92.88%;width:8.48%;height:5.36%"><b>7</b></span></div><figcaption>The New Lead panel, filled in.</figcaption><ol class="legend"><li><b>1</b><span><strong>Name (required)</strong></span></li><li><b>2</b><span><strong>Where the lead came from</strong> — Inbound call, Referral, Walk in, Website and any sources your admin adds.</span></li><li><b>3</b><span><strong>Contact details</strong></span></li><li><b>4</b><span><strong>First note</strong></span></li><li><b>5</b><span><strong>Starting stage</strong></span></li><li><b>6</b><span><strong>Owner – leave on Automated to use routing</strong></span></li><li><b>7</b><span><strong>Save</strong></span></li></ol></figure>
+<aside class="callout note"><span>Note</span><p>Your administrator decides which fields appear on this form and in what order. If you need a field that isn’t there, ask them to add it under Settings → Lead fields.</p></aside>
+</section><section id="lead-record"><p class="eyebrow">Leads</p><h2>Inside a lead record</h2>
+<p>Open any lead to see everything about it on one page: who owns it, where it stands, what happened and
+what is due next.</p>
+<figure class="shot"><div class="frame"><img src="images/lead-detail.jpg" alt="A lead record." loading="lazy"><span class="hot" style="left:56.77%;top:14.22%;width:11.73%;height:4.91%"><b>1</b></span><span class="hot" style="left:22.98%;top:30.60%;width:11.90%;height:6.00%"><b>2</b></span><span class="hot" style="left:38.57%;top:42.49%;width:8.27%;height:5.36%"><b>3</b></span><span class="hot" style="left:18.74%;top:72.93%;width:5.79%;height:5.42%"><b>4</b></span><span class="hot" style="left:74.37%;top:75.87%;width:7.73%;height:4.13%"><b>5</b></span><span class="hot" style="left:47.42%;top:81.22%;width:9.78%;height:4.56%"><b>6</b></span></div><figcaption>A lead record.</figcaption><ol class="legend"><li><b>1</b><span><strong>Header actions</strong> — contact the lead, schedule a meeting, edit, close the inquiry (<i>Qualify</i>), transfer or share it. <i>Customize page</i> rearranges the blocks.</span></li><li><b>2</b><span><strong>Owner &amp; assignment</strong> — who owns the lead and which queue or team it sits in. Use <i>Change</i> to reassign.</span></li><li><b>3</b><span><strong>Stage path – click a stage to move</strong> — shows progress through your pipeline. Click a later stage to move the lead there.</span></li><li><b>4</b><span><strong>Record tabs</strong> — Overview, Activity, Meetings, Timeline, Work, Files, Started services, Stage history and Contacts.</span></li><li><b>5</b><span><strong>Quick actions</strong> — call, WhatsApp, email, create a task, add a note or copy the lead’s details.</span></li><li><b>6</b><span><strong>Upcoming work</strong> — open tasks and meetings for this lead, with due dates.</span></li></ol></figure>
+
+<h3>Move a lead through the pipeline</h3>
+<p>Click the next stage in the stage path. The lead moves at once and a confirmation such as
+“Aisha Rahman moved to Contacted” appears. Every move is kept under the <i>Stage history</i> tab.
+Some organisations require approval for certain stages; when that applies, the move waits in the approver’s
+<span class="ui">Approvals</span> queue.</p>
+
+<h3>Plan the next step</h3>
+<div class="pair"><figure class="shot small"><div class="frame"><img src="images/lead-task.jpg" alt="&lt;b&gt;Create task&lt;/b&gt;: title, type, due date and time, notes and an optional reminder." loading="lazy"></div><figcaption><b>Create task</b>: title, type, due date and time, notes and an optional reminder.</figcaption></figure><figure class="shot small"><div class="frame"><img src="images/lead-meeting.jpg" alt="&lt;b&gt;Schedule meeting&lt;/b&gt;: subject, agenda, time and time zone, location or video link, guests and reminder." loading="lazy"></div><figcaption><b>Schedule meeting</b>: subject, agenda, time and time zone, location or video link, guests and reminder.</figcaption></figure></div>
+
+<h3>Close or hand over a lead</h3>
+<div class="pair"><figure class="shot small"><div class="frame"><img src="images/lead-close.jpg" alt="&lt;b&gt;Qualify&lt;/b&gt; closes the inquiry as &lt;i&gt;Engaged&lt;/i&gt; (won) or &lt;i&gt;Declined&lt;/i&gt; (lost)." loading="lazy"></div><figcaption><b>Qualify</b> closes the inquiry as <i>Engaged</i> (won) or <i>Declined</i> (lost).</figcaption></figure><figure class="shot small"><div class="frame"><img src="images/lead-transfer.jpg" alt="&lt;b&gt;Transfer&lt;/b&gt; hands the lead to a colleague or team, with an optional reason." loading="lazy"></div><figcaption><b>Transfer</b> hands the lead to a colleague or team, with an optional reason.</figcaption></figure></div>
+<figure class="shot"><div class="frame"><img src="images/lead-timeline.jpg" alt="The Timeline tab records every change, meeting and task on the lead, newest first." loading="lazy"></div><figcaption>The Timeline tab records every change, meeting and task on the lead, newest first.</figcaption></figure>
+</section><section id="daily"><p class="eyebrow">Your day</p><h2>Follow-ups, My Work and the calendar</h2>
+<p>When a follow-up falls due, the CRM tells you even if you are on another screen. Deal with each one in
+place, or choose <i>Later</i> to come back to them.</p>
+<figure class="shot"><div class="frame"><img src="images/followups-due.jpg" alt="The follow-ups-due reminder." loading="lazy"><span class="hot" style="left:25.48%;top:44.30%;width:6.76%;height:4.91%"><b>1</b></span><span class="hot" style="left:63.37%;top:65.18%;width:4.82%;height:4.91%"><b>2</b></span></div><figcaption>The follow-ups-due reminder.</figcaption><ol class="legend"><li><b>1</b><span><strong>Complete, snooze or open the lead</strong> — <i>Complete</i> closes the task, <i>Snooze</i> pushes it back, <i>Open lead</i> takes you to the record, <i>Dismiss</i> hides the reminder.</span></li><li><b>2</b><span><strong>Decide later</strong> — closes the reminder without changing anything. <i>Dismiss all</i> clears every reminder in the list.</span></li></ol></figure>
+
+<h3>My Work</h3>
+<p>My Work is your to-do list across every lead and customer. Overdue tasks are flagged in red and tasks due
+today in amber. Each row lets you complete the task, log a call, schedule a meeting or jump to the lead.</p>
+<figure class="shot"><div class="frame"><img src="images/my-work.jpg" alt="My Work, listing tasks across several leads." loading="lazy"><span class="hot" style="left:18.88%;top:13.98%;width:5.55%;height:4.75%"><b>1</b></span><span class="hot" style="left:21.77%;top:19.46%;width:6.72%;height:4.75%"><b>2</b></span><span class="hot" style="left:90.11%;top:8.43%;width:8.92%;height:5.36%"><b>3</b></span></div><figcaption>My Work, listing tasks across several leads.</figcaption><ol class="legend"><li><b>1</b><span><strong>Tasks / Reminders / My Day</strong> — <i>My Day</i> combines today’s tasks and meetings.</span></li><li><b>2</b><span><strong>Due-date buckets</strong> — All, Overdue, Due today, Upcoming, Unassigned and Completed.</span></li><li><b>3</b><span><strong>Add task</strong> — create a task that isn’t tied to a record, or link one.</span></li></ol></figure>
+
+<h3>Calendar and meetings</h3>
+<figure class="shot"><div class="frame"><img src="images/calendar.jpg" alt="The calendar in week view, showing meetings and tasks." loading="lazy"><span class="hot" style="left:23.17%;top:11.77%;width:3.34%;height:4.91%"><b>1</b></span><span class="hot" style="left:87.30%;top:11.77%;width:11.73%;height:4.91%"><b>2</b></span><span class="hot" style="left:33.48%;top:17.91%;width:7.15%;height:4.91%"><b>3</b></span></div><figcaption>The calendar in week view, showing meetings and tasks.</figcaption><ol class="legend"><li><b>1</b><span><strong>Day / Week / Month</strong></span></li><li><b>2</b><span><strong>Schedule meeting</strong></span></li><li><b>3</b><span><strong>Whose calendar</strong> — switch between your own items, everyone’s and your team’s. Turn on <i>Show cancelled</i> to see cancelled meetings.</span></li></ol></figure>
+<div class="pair"><figure class="shot small"><div class="frame"><img src="images/meetings.jpg" alt="&lt;b&gt;Meetings&lt;/b&gt; lists every meeting you can see, filtered by state and date." loading="lazy"></div><figcaption><b>Meetings</b> lists every meeting you can see, filtered by state and date.</figcaption></figure><figure class="shot small"><div class="frame"><img src="images/notifications.jpg" alt="&lt;b&gt;Notifications&lt;/b&gt; filter by unread, category and priority." loading="lazy"></div><figcaption><b>Notifications</b> filter by unread, category and priority.</figcaption></figure></div>
+<figure class="shot"><div class="frame"><img src="images/inbox.jpg" alt="&lt;b&gt;Inbox&lt;/b&gt; gathers email threads and WhatsApp conversations you work, split into Mine, Unassigned, Team and All." loading="lazy"></div><figcaption><b>Inbox</b> gathers email threads and WhatsApp conversations you work, split into Mine, Unassigned, Team and All.</figcaption></figure>
+</section><section id="customers"><p class="eyebrow">Customers</p><h2>Accounts and contacts</h2>
+<p>An <em>account</em> is an organisation you do business with: a company, an authority or a partner.
+A <em>contact</em> is a person. A contact can act for one or more accounts, or be a direct customer
+in their own right.</p>
+<figure class="shot"><div class="frame"><img src="images/accounts.jpg" alt="The Accounts list." loading="lazy"><span class="hot" style="left:71.13%;top:17.60%;width:8.93%;height:5.36%"><b>1</b></span><span class="hot" style="left:85.34%;top:17.83%;width:8.27%;height:4.91%"><b>2</b></span></div><figcaption>The Accounts list.</figcaption><ol class="legend"><li><b>1</b><span><strong>Columns &amp; saved views</strong> — choose the columns you want and save the combination as a view.</span></li><li><b>2</b><span><strong>New account</strong> — only a name is required; add the legal name for documents.</span></li></ol></figure>
+<figure class="shot"><div class="frame"><img src="images/account-detail.jpg" alt="An account record: information, related contacts, leads, opportunities, services, payments and documents." loading="lazy"></div><figcaption>An account record: information, related contacts, leads, opportunities, services, payments and documents.</figcaption></figure>
+<div class="pair"><figure class="shot small"><div class="frame"><img src="images/contacts.jpg" alt="The Contacts list." loading="lazy"></div><figcaption>The Contacts list.</figcaption></figure><figure class="shot small"><div class="frame"><img src="images/contact-new.jpg" alt="New contact: name, given and family name, preferred language and how to reach them." loading="lazy"></div><figcaption>New contact: name, given and family name, preferred language and how to reach them.</figcaption></figure></div>
+</section><section id="sales"><p class="eyebrow">Sales</p><h2>Opportunities, proposals and approvals</h2>
+<p>An <em>opportunity</em> is a deal you are working: who it is with, what it is worth, how likely it is to
+close and when. Switch between a list and a board to see deals by stage.</p>
+<figure class="shot"><div class="frame"><img src="images/opps-list.jpg" alt="Opportunities in list view." loading="lazy"><span class="hot" style="left:22.20%;top:17.68%;width:5.59%;height:4.75%"><b>1</b></span><span class="hot" style="left:88.13%;top:8.43%;width:10.90%;height:5.36%"><b>2</b></span></div><figcaption>Opportunities in list view.</figcaption><ol class="legend"><li><b>1</b><span><strong>List / Board</strong> — the board groups deals by stage with the total value of each column.</span></li><li><b>2</b><span><strong>New opportunity</strong> — link a customer, then enter the value, currency, expected close date and probability.</span></li></ol></figure>
+<figure class="shot"><div class="frame"><img src="images/opps-board.jpg" alt="The board view. Use &lt;i&gt;Move to…&lt;/i&gt; on a card to change its stage." loading="lazy"></div><figcaption>The board view. Use <i>Move to…</i> on a card to change its stage.</figcaption></figure>
+<div class="pair"><figure class="shot small"><div class="frame"><img src="images/opp-new.jpg" alt="Creating an opportunity." loading="lazy"></div><figcaption>Creating an opportunity.</figcaption></figure><figure class="shot small"><div class="frame"><img src="images/opp-detail.jpg" alt="An opportunity record, with &lt;i&gt;Mark won&lt;/i&gt; and &lt;i&gt;Mark lost&lt;/i&gt; at the top right." loading="lazy"></div><figcaption>An opportunity record, with <i>Mark won</i> and <i>Mark lost</i> at the top right.</figcaption></figure></div>
+<div class="pair"><figure class="shot small"><div class="frame"><img src="images/proposals.jpg" alt="&lt;b&gt;Proposals&lt;/b&gt; keeps each commercial proposal with its versions and approvals." loading="lazy"></div><figcaption><b>Proposals</b> keeps each commercial proposal with its versions and approvals.</figcaption></figure><figure class="shot small"><div class="frame"><img src="images/approvals.jpg" alt="&lt;b&gt;Approvals&lt;/b&gt; collects decisions waiting on you: transfers, stage moves, proposals and service completions." loading="lazy"></div><figcaption><b>Approvals</b> collects decisions waiting on you: transfers, stage moves, proposals and service completions.</figcaption></figure></div>
+</section><section id="insight"><p class="eyebrow">Insight</p><h2>Dashboards and reports</h2>
+<p>Every figure on a dashboard or report is counted by the server across the records you are allowed to see,
+so two people may see different totals for the same report.</p>
+<figure class="shot"><div class="frame"><img src="images/dashboard.jpg" alt="Your home dashboard." loading="lazy"><span class="hot" style="left:79.80%;top:11.90%;width:6.67%;height:4.91%"><b>1</b></span><span class="hot" style="left:85.62%;top:11.90%;width:7.07%;height:4.91%"><b>2</b></span><span class="hot" style="left:91.85%;top:11.90%;width:7.19%;height:4.91%"><b>3</b></span></div><figcaption>Your home dashboard.</figcaption><ol class="legend"><li><b>1</b><span><strong>Filters</strong> — limit every tile to a period, owner or team.</span></li><li><b>2</b><span><strong>Templates</strong> — start from a ready-made layout.</span></li><li><b>3</b><span><strong>Customize</strong> — add, remove and rearrange tiles.</span></li></ol></figure>
+<figure class="shot"><div class="frame"><img src="images/reports.jpg" alt="The Reports workspace, showing the Lead Intake Summary." loading="lazy"><span class="hot" style="left:18.74%;top:18.78%;width:25.06%;height:5.36%"><b>1</b></span><span class="hot" style="left:43.24%;top:18.78%;width:14.18%;height:5.36%"><b>2</b></span><span class="hot" style="left:18.74%;top:23.67%;width:8.48%;height:5.36%"><b>3</b></span></div><figcaption>The Reports workspace, showing the Lead Intake Summary.</figcaption><ol class="legend"><li><b>1</b><span><strong>Pick a report</strong></span></li><li><b>2</b><span><strong>Period &amp; grouping</strong> — choose the period, the owner and how to group results (by day, week or month).</span></li><li><b>3</b><span><strong>Export CSV</strong> — download the report’s rows.</span></li></ol></figure>
+</section><section id="marketing"><p class="eyebrow">Outreach</p><h2>Segments, campaigns and imports</h2>
+<div class="gallery three">
+<figure class="shot small"><div class="frame"><img src="images/segments.jpg" alt="&lt;b&gt;Segments&lt;/b&gt; are saved groups of leads or contacts to send campaigns to." loading="lazy"></div><figcaption><b>Segments</b> are saved groups of leads or contacts to send campaigns to.</figcaption></figure>
+<figure class="shot small"><div class="frame"><img src="images/campaigns.jpg" alt="&lt;b&gt;Campaigns&lt;/b&gt; reach a segment by email, WhatsApp templates and call tasks, once or as a sequence." loading="lazy"></div><figcaption><b>Campaigns</b> reach a segment by email, WhatsApp templates and call tasks, once or as a sequence.</figcaption></figure>
+<figure class="shot small"><div class="frame"><img src="images/imports.jpg" alt="&lt;b&gt;Imports&lt;/b&gt; bring in leads from a spreadsheet and keep a record of each import." loading="lazy"></div><figcaption><b>Imports</b> bring in leads from a spreadsheet and keep a record of each import.</figcaption></figure>
+</div>
+</section><section id="admin"><p class="eyebrow">Administrators</p><h2>Teams, queues and settings</h2>
+<div class="pair"><figure class="shot small"><div class="frame"><img src="images/teams.jpg" alt="&lt;b&gt;Teams&lt;/b&gt; group people who work together. Group teams into departments so a manager can see across them." loading="lazy"></div><figcaption><b>Teams</b> group people who work together. Group teams into departments so a manager can see across them.</figcaption></figure><figure class="shot small"><div class="frame"><img src="images/queues.jpg" alt="&lt;b&gt;Queues&lt;/b&gt; hold unassigned work. The fallback queue receives any lead that routing could not place." loading="lazy"></div><figcaption><b>Queues</b> hold unassigned work. The fallback queue receives any lead that routing could not place.</figcaption></figure></div>
+<figure class="shot"><div class="frame"><img src="images/settings.jpg" alt="Settings." loading="lazy"><span class="hot" style="left:8.26%;top:16.21%;width:12.37%;height:6.02%"><b>1</b></span><span class="hot" style="left:5.41%;top:21.88%;width:16.40%;height:3.58%"><b>2</b></span></div><figcaption>Settings.</figcaption><ol class="legend"><li><b>1</b><span><strong>Search settings</strong> — type what you want to change, such as “stages” or “time zone”.</span></li><li><b>2</b><span><strong>Quick access</strong> — organisation details, users and members, lead fields, roles and permissions, notifications.</span></li></ol></figure>
+<p>Common changes:</p>
+<table><thead><tr><th>To change…</th><th>Go to</th></tr></thead><tbody>
+<tr><td>Organisation name, time zone, date format, languages</td><td>Settings → General → Organization</td></tr>
+<tr><td>Who can sign in, and their roles</td><td>Settings → People &amp; access</td></tr>
+<tr><td>Fields on the lead form and their order</td><td>Settings → Lead settings → Lead fields</td></tr>
+<tr><td>Pipeline stages, statuses and lifecycle</td><td>Settings → Lead settings → Pipelines &amp; stages</td></tr>
+<tr><td>Assignment and routing rules</td><td>Settings → Assignment</td></tr>
+<tr><td>Email and WhatsApp channels</td><td>Settings → Channels</td></tr>
+<tr><td>Duplicate rules</td><td>Settings → Duplicate management</td></tr>
+</tbody></table>
+</section><section id="help"><p class="eyebrow">Reference</p><h2>Common questions</h2>
+<dl class="faq">
+<dt>A screen in this guide is missing from my sidebar.</dt>
+<dd>Workspaces appear only when your role allows them and your organisation has the feature. Ask your administrator.</dd>
+<dt>A panel says I may not see something, rather than showing it empty.</dt>
+<dd>That is deliberate. “Nothing here” and “you don’t have access” are shown differently so an empty list never hides a permission problem.</dd>
+<dt>My lead went to a queue instead of to me.</dt>
+<dd>When <i>Assign to</i> is left on <i>Automated</i>, routing rules decide the owner. Leads that no rule matches go to the fallback queue, where anyone with access can pick them up.</dd>
+<dt>Times look wrong.</dt>
+<dd>Times are shown in your organisation’s time zone, which an administrator sets in Settings → General.</dd>
+<dt>An error mentions a reference code.</dt>
+<dd>Copy the reference and send it to your support contact. It lets them find exactly what happened.</dd>
+</dl>
+<h3>Keyboard shortcuts</h3>
+<table><tbody>
+<tr><td><kbd>Ctrl</kbd> <kbd>K</kbd></td><td>Search, open a record or go to a screen</td></tr>
+<tr><td><kbd>Alt</kbd> <kbd>Shift</kbd> <kbd>N</kbd></td><td>New personal note</td></tr>
+<tr><td><kbd>Esc</kbd></td><td>Close the current panel or dialog</td></tr>
+</tbody></table>
+</section></main>
+</div>
+
+<script>
+(() => {
+  const links = [...document.querySelectorAll('nav.toc a')];
+  const byId = new Map(links.map(a => [a.getAttribute('href').slice(1), a]));
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { links.forEach(a => a.classList.remove('on')); byId.get(e.target.id)?.classList.add('on'); } });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  document.querySelectorAll('main section').forEach(s => io.observe(s));
+})();
+</script>

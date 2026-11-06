@@ -1,0 +1,123 @@
+<title>CRM User Guide</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: product manual — sticky contents rail on the left, one reading column of annotated screenshots. */
+:root {
+  --bg: #f6f8fb; --surface: #ffffff; --ink: #172235; --muted: #5a6577; --line: #dde3ec;
+  --accent: #0b6bd6; --accent-soft: #e6f0fc; --mark: #f05a1a; --mark-ink: #ffffff;
+  --tip: #0f7a55; --tip-soft: #e5f5ee; --admin: #8a4b00; --admin-soft: #fbf0e1;
+  --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f141c; --surface: #161d28; --ink: #e5eaf2; --muted: #9aa5b6; --line: #2a3443;
+  --accent: #5ca4f5; --accent-soft: #17283d; --mark: #ff7a3d; --mark-ink: #1a0c04;
+  --tip: #5fd0a5; --tip-soft: #12291f; --admin: #f2b366; --admin-soft: #2c2010; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0f141c; --surface: #161d28; --ink: #e5eaf2; --muted: #9aa5b6; --line: #2a3443;
+  --accent: #5ca4f5; --accent-soft: #17283d; --mark: #ff7a3d; --mark-ink: #1a0c04;
+  --tip: #5fd0a5; --tip-soft: #12291f; --admin: #f2b366; --admin-soft: #2c2010; color-scheme: dark }
+
+* { box-sizing: border-box }
+html { scroll-behavior: smooth; scroll-padding-top: 24px }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto } }
+body { background: var(--bg); color: var(--ink); font: 17px/1.6 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)) }
+a { color: var(--accent) }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px }
+
+.wrap { max-width: 1240px; margin: 0 auto; display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 56px; padding-block: 48px 96px }
+header.cover { grid-column: 1 / -1; display: grid; gap: 12px; padding-bottom: 24px; border-bottom: 1px solid var(--line) }
+.cover .kicker { font: 500 12px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--accent) }
+h1 { font: 700 clamp(36px, 5vw, 56px)/1.05 var(--display); margin: 0; letter-spacing: -.02em; text-wrap: balance }
+.cover p { margin: 0; max-width: 62ch; color: var(--muted); font-size: 19px }
+.cover .meta { font: 500 12px/1.5 var(--mono); color: var(--muted) }
+
+nav.toc { position: sticky; top: calc(24px + env(safe-area-inset-top, 0px)); align-self: start; max-height: calc(100vh - 48px); overflow-y: auto }
+nav.toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px }
+nav.toc a { display: grid; gap: 1px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: var(--ink); font-weight: 600; font-size: 15px; line-height: 1.3 }
+nav.toc a span { font: 500 10.5px/1.2 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted) }
+nav.toc a:hover, nav.toc a.on { background: var(--accent-soft); color: var(--accent) }
+
+main { min-width: 0; display: grid; gap: 72px }
+section { min-width: 0; display: grid; gap: 18px; align-content: start }
+section > p, section > h3, dl, .steps { max-width: 68ch }
+.eyebrow { margin: 0; font: 500 12px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--accent) }
+h2 { font: 700 34px/1.1 var(--display); margin: -6px 0 4px; letter-spacing: -.015em; text-wrap: balance }
+h3 { font: 600 22px/1.25 var(--display); margin: 18px 0 0; text-wrap: balance }
+p { margin: 0 }
+em { font-style: normal; font-weight: 600 }
+kbd { font: 500 12.5px/1 var(--mono); padding: 3px 6px; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5px; background: var(--surface) }
+.ui { font-weight: 600; color: var(--accent); white-space: nowrap }
+
+figure { margin: 0; display: grid; gap: 10px; min-width: 0 }
+.frame { position: relative; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--surface); box-shadow: 0 1px 2px rgb(15 30 60 / .06), 0 8px 24px -12px rgb(15 30 60 / .18) }
+.frame img { display: block; width: 100%; height: auto }
+.hot { position: absolute; border: 2px solid var(--mark); border-radius: 7px; box-shadow: 0 0 0 3px rgb(240 90 26 / .18); pointer-events: none }
+.hot b { position: absolute; top: -11px; left: -11px; width: 22px; height: 22px; border-radius: 50%; background: var(--mark); color: var(--mark-ink); font: 600 12px/22px var(--mono); text-align: center; box-shadow: 0 1px 3px rgb(0 0 0 / .3) }
+figcaption { font-size: 15px; color: var(--muted); line-height: 1.45 }
+figcaption b { color: var(--ink) }
+.legend { list-style: none; margin: 4px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px 24px }
+.legend li { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px; font-size: 15.5px; line-height: 1.45 }
+.legend li > b { width: 22px; height: 22px; border-radius: 50%; background: var(--mark); color: var(--mark-ink); font: 600 12px/22px var(--mono); text-align: center; margin-top: 1px }
+
+.pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px }
+.gallery { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px }
+.gallery figcaption, .pair figcaption { font-size: 14.5px }
+
+.steps { margin: 0; padding: 0; list-style: none; counter-reset: s; display: grid; gap: 10px }
+.steps li { counter-increment: s; display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 12px }
+.steps li::before { content: counter(s); width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid var(--accent); color: var(--accent); font: 600 13px/25px var(--mono); text-align: center }
+
+.callout { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 14px; align-items: baseline; padding: 14px 18px; border-radius: 10px; background: var(--tip-soft); max-width: 76ch }
+.callout span { font: 500 11px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--tip) }
+.callout.note { background: var(--accent-soft) } .callout.note span { color: var(--accent) }
+.callout.admin { background: var(--admin-soft) } .callout.admin span { color: var(--admin) }
+.callout p { font-size: 16px }
+
+table { border-collapse: collapse; width: 100%; max-width: 760px; font-size: 16px }
+th, td { text-align: start; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top }
+th { font: 500 11px/1.2 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted) }
+td:last-child { color: var(--muted) }
+.faq { margin: 0; display: grid; gap: 6px }
+.faq dt { font-weight: 600; margin-top: 12px }
+.faq dd { margin: 0; color: var(--muted) }
+
+@media (max-width: 960px) {
+  .wrap { grid-template-columns: minmax(0, 1fr); gap: 32px; padding-block: 28px 64px }
+  nav.toc { position: static; max-height: none }
+  nav.toc ol { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)) }
+  .gallery { grid-template-columns: repeat(2, minmax(0, 1fr)) }
+}
+@media (max-width: 600px) {
+  body { font-size: 16px }
+  .pair, .gallery { grid-template-columns: minmax(0, 1fr) }
+  h2 { font-size: 28px }
+  .hot b { width: 18px; height: 18px; font-size: 10px; line-height: 18px; top: -9px; left: -9px }
+}
+</style>
+
+<div class="wrap">
+  <header class="cover">
+    <span class="kicker">User guide</span>
+    <h1>Using the CRM</h1>
+    <p>How to find your way around, capture and work leads, plan follow-ups, manage customers and deals, and read your numbers. Every screenshot comes from the application itself, and the orange numbers point to the controls described beneath each one.</p>
+    <span class="meta">Screens captured November 2026 from the current develop build with sample data. Your organisation’s fields, stages and sidebar may differ.</span>
+  </header>
+  <nav class="toc" aria-label="Contents"><ol>{{TOC}}</ol></nav>
+  <main>{{BODY}}</main>
+</div>
+
+<script>
+(() => {
+  const links = [...document.querySelectorAll('nav.toc a')];
+  const byId = new Map(links.map(a => [a.getAttribute('href').slice(1), a]));
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { links.forEach(a => a.classList.remove('on')); byId.get(e.target.id)?.classList.add('on'); } });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  document.querySelectorAll('main section').forEach(s => io.observe(s));
+})();
+</script>

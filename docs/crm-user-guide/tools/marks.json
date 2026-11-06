@@ -1,0 +1,365 @@
+{
+ "followups-due": [
+  {
+   "label": "Complete, snooze or open the lead",
+   "x": 27.57,
+   "y": 46.75,
+   "w": 5.36,
+   "h": 3.11
+  },
+  {
+   "label": "Decide later",
+   "x": 65.46,
+   "y": 67.64,
+   "w": 3.42,
+   "h": 3.11
+  }
+ ],
+ "shell": [
+  {
+   "label": "Sidebar navigation",
+   "x": 2.5,
+   "y": 9.78,
+   "w": 16.04,
+   "h": 4.44
+  },
+  {
+   "label": "Global search (Ctrl K)",
+   "x": 20.83,
+   "y": 3.28,
+   "w": 26.67,
+   "h": 3.56
+  },
+  {
+   "label": "Language switch",
+   "x": 87.53,
+   "y": 3.28,
+   "w": 5.38,
+   "h": 3.11
+  },
+  {
+   "label": "Notifications",
+   "x": 92.92,
+   "y": 3.28,
+   "w": 2.22,
+   "h": 3.56
+  },
+  {
+   "label": "Your account",
+   "x": 1.94,
+   "y": 96.44,
+   "w": 16.6,
+   "h": 5.33
+  },
+  {
+   "label": "Assistant",
+   "x": 97.64,
+   "y": 96.44,
+   "w": 3.47,
+   "h": 3.56
+  }
+ ],
+ "leads-list": [
+  {
+   "label": "Search leads",
+   "x": 23.4,
+   "y": 11.11,
+   "w": 14.58,
+   "h": 3.33
+  },
+  {
+   "label": "Choose a view",
+   "x": 39.44,
+   "y": 11.11,
+   "w": 8.62,
+   "h": 3.56
+  },
+  {
+   "label": "Add filter",
+   "x": 49.18,
+   "y": 11.11,
+   "w": 7.7,
+   "h": 3.56
+  },
+  {
+   "label": "New Lead",
+   "x": 89.08,
+   "y": 11.11,
+   "w": 2.22,
+   "h": 3.56
+  },
+  {
+   "label": "Export",
+   "x": 92.13,
+   "y": 11.11,
+   "w": 4.81,
+   "h": 3.56
+  },
+  {
+   "label": "Click a name to open the lead",
+   "x": 27.29,
+   "y": 26.39,
+   "w": 6.55,
+   "h": 2.33
+  }
+ ],
+ "leads-views": [],
+ "lead-new": [
+  {
+   "label": "Name (required)",
+   "x": 73.19,
+   "y": 17.22,
+   "w": 10.66,
+   "h": 4.22
+  },
+  {
+   "label": "Where the lead came from",
+   "x": 86.7,
+   "y": 17.22,
+   "w": 13.02,
+   "h": 4.44
+  },
+  {
+   "label": "Contact details",
+   "x": 73.19,
+   "y": 29.17,
+   "w": 10.66,
+   "h": 4.22
+  },
+  {
+   "label": "First note",
+   "x": 72.01,
+   "y": 41.34,
+   "w": 27.71,
+   "h": 9.89
+  },
+  {
+   "label": "Starting stage",
+   "x": 72.01,
+   "y": 57.79,
+   "w": 27.71,
+   "h": 3.56
+  },
+  {
+   "label": "Owner \u2013 leave on Automated to use routing",
+   "x": 72.01,
+   "y": 72.3,
+   "w": 27.71,
+   "h": 3.56
+  },
+  {
+   "label": "Save",
+   "x": 92.65,
+   "y": 95.56,
+   "w": 7.08,
+   "h": 3.56
+  }
+ ],
+ "lead-detail": [
+  {
+   "label": "Header actions",
+   "x": 58.86,
+   "y": 16.67,
+   "w": 10.33,
+   "h": 3.11
+  },
+  {
+   "label": "Owner & assignment",
+   "x": 25.07,
+   "y": 33.6,
+   "w": 10.5,
+   "h": 4.2
+  },
+  {
+   "label": "Stage path \u2013 click a stage to move",
+   "x": 40.66,
+   "y": 45.17,
+   "w": 6.87,
+   "h": 3.56
+  },
+  {
+   "label": "Record tabs",
+   "x": 20.83,
+   "y": 75.64,
+   "w": 4.39,
+   "h": 3.62
+  },
+  {
+   "label": "Quick actions",
+   "x": 76.46,
+   "y": 77.94,
+   "w": 6.33,
+   "h": 2.33
+  },
+  {
+   "label": "Upcoming work",
+   "x": 49.51,
+   "y": 83.5,
+   "w": 8.38,
+   "h": 2.76
+  }
+ ],
+ "lead-task": [],
+ "lead-meeting": [],
+ "lead-close": [],
+ "lead-transfer": [],
+ "lead-timeline": [],
+ "pools": [],
+ "opps-list": [
+  {
+   "label": "List / Board",
+   "x": 24.29,
+   "y": 20.06,
+   "w": 4.19,
+   "h": 2.95
+  },
+  {
+   "label": "New opportunity",
+   "x": 90.22,
+   "y": 11.11,
+   "w": 9.5,
+   "h": 3.56
+  }
+ ],
+ "opps-board": [],
+ "opp-new": [],
+ "opp-detail": [],
+ "accounts": [
+  {
+   "label": "Columns & saved views",
+   "x": 73.22,
+   "y": 20.28,
+   "w": 7.53,
+   "h": 3.56
+  },
+  {
+   "label": "New account",
+   "x": 87.43,
+   "y": 20.28,
+   "w": 6.87,
+   "h": 3.11
+  }
+ ],
+ "account-detail": [],
+ "contacts": [],
+ "contact-new": [],
+ "my-work": [
+  {
+   "label": "Tasks / Reminders / My Day",
+   "x": 20.97,
+   "y": 16.36,
+   "w": 4.15,
+   "h": 2.95
+  },
+  {
+   "label": "Due-date buckets",
+   "x": 23.86,
+   "y": 21.84,
+   "w": 5.32,
+   "h": 2.95
+  },
+  {
+   "label": "Add task",
+   "x": 92.2,
+   "y": 11.11,
+   "w": 7.52,
+   "h": 3.56
+  }
+ ],
+ "calendar": [
+  {
+   "label": "Day / Week / Month",
+   "x": 24.84,
+   "y": 14.22,
+   "w": 1.94,
+   "h": 3.11
+  },
+  {
+   "label": "Schedule meeting",
+   "x": 89.39,
+   "y": 14.22,
+   "w": 10.33,
+   "h": 3.11
+  },
+  {
+   "label": "Whose calendar",
+   "x": 35.57,
+   "y": 20.36,
+   "w": 5.75,
+   "h": 3.11
+  }
+ ],
+ "meetings": [],
+ "dashboard": [
+  {
+   "label": "Filters",
+   "x": 81.89,
+   "y": 14.36,
+   "w": 5.27,
+   "h": 3.11
+  },
+  {
+   "label": "Templates",
+   "x": 87.71,
+   "y": 14.36,
+   "w": 5.67,
+   "h": 3.11
+  },
+  {
+   "label": "Customize",
+   "x": 93.94,
+   "y": 14.36,
+   "w": 5.79,
+   "h": 3.11
+  }
+ ],
+ "reports": [
+  {
+   "label": "Pick a report",
+   "x": 20.83,
+   "y": 21.46,
+   "w": 23.66,
+   "h": 3.56
+  },
+  {
+   "label": "Period & grouping",
+   "x": 45.33,
+   "y": 21.46,
+   "w": 12.78,
+   "h": 3.56
+  },
+  {
+   "label": "Export CSV",
+   "x": 20.83,
+   "y": 26.35,
+   "w": 7.08,
+   "h": 3.56
+  }
+ ],
+ "inbox": [],
+ "notifications": [],
+ "approvals": [],
+ "proposals": [],
+ "campaigns": [],
+ "segments": [],
+ "imports": [],
+ "teams": [],
+ "queues": [],
+ "settings": [
+  {
+   "label": "Search settings",
+   "x": 10.35,
+   "y": 19.22,
+   "w": 10.97,
+   "h": 4.22
+  },
+  {
+   "label": "Quick access",
+   "x": 7.5,
+   "y": 23.67,
+   "w": 15,
+   "h": 1.78
+  }
+ ],
+ "command-palette": []
+}
