@@ -1,6 +1,6 @@
 # Call on my phone: final implementation plan
 
-**Status:** Implementation-ready, pending the owner decisions in §7 · 2026-11-08
+**Status:** Approved architecturally; targeted corrections of 2026-11-08 applied (§2.1 events table, §2.3 expiry, §2.4 open response, §2.6 Activity link, §2.8 national numbers, §1.2 TTL and collapse, §4 wording, §5.1 tests)
 **Replaces:** v4, with every Critical/Major finding of the independent code review fixed (§8).
 **Kept as before:**
 - the simplified architecture;
@@ -106,7 +106,15 @@ The web shows a small call card with status it can prove, and the call is logged
 - **FCM message:**
   - `notification` + `data{purpose, reference_id, organization_id}`.
   - Android `channel_id = "crm_call_requests"`, `priority = HIGH`.
-  - `ttl = ttl_seconds`, `collapse_key = reference_id`.
+  - **`ttl`:** frozen per attempt as the whole seconds left until the request's `expires_at`, at
+    least 1. FCM discards a message it could not deliver within `ttl`.
+    - TTL governs **delivery only**. A notification already shown stays in the tray after expiry,
+      and the server refuses its tap (§2.4).
+  - **`collapse_key = reference_id`:** FCM keeps only the newest undelivered message per key while
+    the phone is offline, so a retry never queues a second copy.
+    - It does **not** replace a notification already displayed.
+  - **`android.notification.tag = reference_id`:** a later delivery for the same request replaces
+    the shown notification instead of adding a second one.
 - **Outcomes**, the same closed set as email:
   - `accepted`: FCM returned a message id. This proves the provider took it, not that the phone
     received it.
@@ -134,15 +142,27 @@ The web shows a small call card with status it can prove, and the call is logged
 |---|---|
 | `organization_id, id` | Primary key, with row-level security |
 | `member_id, lead_id, contact_point_id` | Explicit number choice when a Lead has several |
-| `number_fingerprint` | HMAC of the dialable number at create. Detects `number_changed` at open |
+| `number_fingerprint` | HMAC of the **E.164** number at create. Detects `number_changed` at open |
 | `target_device_id` | The Platform device id. Equals the phone's token `session_id` |
 | `state, failure_code` | §2.2. Forward-only |
-| `dispatch_attempt, ttl_seconds` | `ttl_seconds` is frozen once at create (120) |
-| `expires_at` | `created_at + 120 s` |
+| `dispatch_attempt` | Attempt counter for the push key (§2.3) |
+| `expires_at` | `created_at + 120 s`. Bounds **both** `requested` and `sent` |
 | `opened_at, open_attempt_id` | Single-use open fence |
 | `dial_started_at, ended_at, observed_seconds, tracking` | `tracking` is `followed`, `untracked` or `interrupted` |
-| `activity_id` | `UNIQUE (organization_id, activity_id)` |
 | `revision` | ETag |
+
+There is **no** `activity_id` column. The link has **one** source of truth:
+`activity_calls.phone_call_request_id` (§2.6).
+
+**Table `phone_call_request_events`** (durable event deduplication):
+- Columns: `organization_id, request_id, event_id` (**primary key**), `kind`, `occurred_at`,
+  `received_at`, `applied` (bool).
+- A composite FK to the request, and row-level security.
+- Every event is `INSERT … ON CONFLICT DO NOTHING` **in the same transaction** as its state
+  transition. A re-sent event finds its row and answers 204 with no effect, whether the retry comes
+  seconds or days later, after a process restart or on another server instance.
+- `applied = false` records an event that arrived valid but had no transition from the current
+  state. It is kept for audit and is never re-applied.
 
 **Active-request boundary:** a partial unique index on `(organization_id, member_id)` where
 `state IN ('requested','sent','opened','dialing')`.
@@ -158,9 +178,9 @@ The web shows a small call card with status it can prove, and the call is logged
 | `requested` | Platform `accepted` | `sent` |
 | `requested` | Platform `ambiguous` | `sent` (`delivery_unconfirmed = true`) |
 | `requested` | Platform `rejected` | `failed` (`device_not_ready`, `device_not_found`, `token_unregistered`, `push_rejected`) |
-| `requested` | retry budget used up (§2.3) | `failed` (`push_unavailable`) |
+| `requested` | retry budget used up before `expires_at` (§2.3) | `failed` (`push_unavailable`) |
 | `requested`/`sent` | web cancel | `cancelled` |
-| `sent` | `expires_at` reached (timer or backstop) | `expired` |
+| `requested`/`sent` | `expires_at` reached: workflow timer, **write-time expiry** or backstop (§2.3), including when the workflow failed permanently | `expired` (`failure_code = push_unavailable` if it was still `requested`) |
 | `sent` | open accepted (§2.4) | `opened` |
 | `sent` | open re-check fails | `refused` (`do_not_call`, `record_unavailable`, `number_changed`, `not_permitted`) |
 | `opened` | phone `started` | `dialing` |
@@ -210,13 +230,25 @@ The web shows a small call card with status it can prove, and the call is logged
    - Each result is a guarded update `WHERE state='requested'`, so a cancel that wins the race
      stops further sends.
 4. **Timers, in the same workflow** (D388 §5 delayed-workflow precedent, not a scheduler):
-   - sleep until `expires_at` → a guarded `sent → expired`;
+   - sleep until `expires_at` → a guarded `requested|sent → expired`;
    - after `opened`, sleep 5 min → a guarded `opened → outcome_unknown`;
    - after `dialing`, sleep 90 min → a guarded `dialing → outcome_unknown`.
-5. **Backstop:** a D208 periodic organization job (the existing 15-minute tick) applies the same
-   guarded transitions to any row whose workflow died, plus `abandoned` after 14 days.
-   **Reads also report a `sent` request past `expires_at` as `expired`**, so the card never waits
-   on a sweep.
+5. **Expiry never depends on the workflow being alive.** Three independent paths apply the same
+   guarded transitions:
+   - **a. Write-time expiry.**
+     - Every command on the member's requests applies `requested|sent → expired` to a row past
+       `expires_at` in its own transaction, **before** acting. The commands are: create, open,
+       events, cancel and close.
+     - Create first expires the member's own stale active row. A permanently failed workflow
+       therefore **never blocks the active slot**: the next click frees it and proceeds.
+     - Open of a `requested`/`sent` row past `expires_at` expires it and answers 409
+       `call_request_not_open (expired)`.
+   - **b. Read-time projection.** `GET`s report a `requested|sent` row past `expires_at` as
+     `expired`, so the card never waits on a write.
+   - **c. Backstop.** A D208 periodic organization job (the existing 15-minute tick) applies the
+     timers' transitions to any row whose workflow died, plus `abandoned` after 14 days.
+   - The same write-time rule moves `opened` past 5 min and `dialing` past 90 min to
+     `outcome_unknown` when the member next creates a request.
 
 ### 2.4 Single-use, retry-safe open (phone)
 `POST /phone-call-requests/{id}/actions/open {attempt_id}`. **There is no kernel
@@ -235,7 +267,14 @@ In one transaction, `SELECT … FOR UPDATE`:
 
    A failure from `sent` → `refused(code)`, and the code is returned (409).
 3. If `state = sent` and `now < expires_at`: set `opened`, `open_attempt_id` and `opened_at`, and
-   return `{number, lead_label, organization_id, revision}`.
+   return:
+
+   `{request_id, lead_id, lead_label, contact_point_id, number, organization_id, revision}`
+
+   - `lead_id` is required. The phone passes it to `place(contextKind: 'lead', contextId: lead_id)`
+     and to the Log Call sheet's context, so the Activity is created on the requested Lead and
+     satisfies §2.6's Lead-context check.
+   - `number` is the E.164 form.
 4. **A lost-response retry:** if `state = opened`, `open_attempt_id = attempt_id`,
    `now < opened_at + 60 s` and no phone event has arrived, re-run step 2 and return the
    **same** answer.
@@ -255,26 +294,36 @@ launch.
 `POST /phone-call-requests/{id}/events {event_id, kind, occurred_at, observed_seconds?, tracking?}`
 - `kind` is one of `started`, `ended`, `not_placed`, `dialer_failed` or `untracked`.
 - The same session and organization check as open.
-- `event_id` is unique per request. A repeat is acknowledged with no effect.
+- `event_id` is a UUID the phone creates when it queues the event, and it stays the same across
+  retries.
+- Deduplication is **durable** through `phone_call_request_events` (§2.1). A repeat is
+  acknowledged with 204 and no effect.
 - No `If-Match`, because events are facts (§2.9).
 
 ### 2.6 Logging exactly once (concurrency-safe)
 - **Schema:**
   - `activity_calls.phone_call_request_id uuid NULL`;
   - `UNIQUE (organization_id, phone_call_request_id)`;
-  - a composite FK `(organization_id, phone_call_request_id)` to `phone_call_requests`;
-  - `phone_call_requests.activity_id` is unique;
-  - `ON DELETE SET NULL` from the Activity, with the request going back to `needs_log` through
-    the same command if an Activity is ever removed.
+  - a composite FK `(organization_id, phone_call_request_id)` → `phone_call_requests`, `ON DELETE
+    RESTRICT`. A request that has an Activity cannot be deleted.
+  - **This column is the only link.** The request's read model reaches its Activity by joining on
+    it. There is no reverse FK and no circular reference.
+- **The Activity lifecycle is unchanged.**
+  - No CRM command deletes an Activity today (checked: no delete path in
+    `capabilities/activity`), and `activity_calls` already cascades from `activities`.
+  - If an Activity were ever removed by a future path, the cascade would remove its
+    `activity_calls` row. **The request stays `logged`**, because `logged` is final and never
+    reverts, and its read model then shows "logged, Activity no longer available".
+  - No trigger and no state rollback.
 - **`logCall` with `phone_call_request_id`:** inside the existing single unit of work of
   `log_call.py`.
   1. `SELECT … FOR UPDATE` the request.
   2. Require the **same member**, a loggable state (`opened`, `dialing`, `needs_log`,
      `outcome_unknown`), and that the Activity's contexts **include `request.lead_id`**.
   3. Insert the Activity.
-  4. Set `logged` and `activity_id`.
+  4. Set `logged` on the request.
 - **A concurrent second submission** waits on the lock, then finds `logged` → 409
-  `call_already_logged` with `activity_id`. The client opens it.
+  `call_already_logged` with `activity_id` (read through the join). The client opens it.
 - **The unique index is the backstop:** a violation maps to the same 409 and rolls back the
   second Activity.
 - **A client's own retry** with the same `Idempotency-Key` replays as today.
@@ -299,15 +348,29 @@ launch.
   record, device id and codes, **never the number**.
 
 ### 2.8 Do Not Call, and a safe Copy number
-- **One check, used at create, at open and for Copy.** It reuses the consent and suppression
-  lookup behind `do_not_call_within`, against the contact point's **E.164 form when one exists**:
-  - `opted_out` / `suppressed` → `do_not_call` (blocks);
-  - `address_not_e164` does **not** mean Do Not Call for a SIM call. It is handled by owner
-    decision 5 (§7). The default blocks with a distinct code, `number_not_international`, never
-    labelled "Do Not Call".
+- **One check, used at create, at open and for Copy:** the existing `do_not_call_within` →
+  `eligibility_for_addresses_within`, called with the contact point's canonical address,
+  `consentable_address("phone", normalized)` (`customer/domain/consent.py`).
+  - Suppressions and opt-outs are stored and matched **only on E.164**.
+- **National-format numbers never bypass suppression.**
+  - A number with no E.164 form has no canonical key, so suppression cannot be checked reliably.
+    It is therefore **blocked** with `number_not_international`: "Set your organization's dialling
+    country to call this number".
+  - This is never labelled "Do Not Call", and it is never allowed.
+  - Once the tenant sets a dialling country, normalization (`entity_resolution/domain/
+    normalization.py`, dialling plan) produces E.164, and the number becomes checkable and
+    callable.
+  - This mirrors the existing agent-call rule (`telephony/application/agent.py`), which refuses
+    `address_not_e164` for the same reason.
+- **The codes:**
+  - `opted_out` / `suppressed` → `do_not_call`;
+  - `address_not_e164` → `number_not_international`;
+  - `consent_required` (marketing-only) → **not** a block for a person-to-person call, as in
+    `_DO_NOT_CALL`.
 - **`copy_allowed`**, from the current state, in the request read model: true only if the member
   can still see the contact point and the check passes **now**.
-  - It is always false for `refused(do_not_call|record_unavailable|not_permitted)`.
+  - It is always false for `refused(do_not_call|record_unavailable|not_permitted)` and for
+    `number_not_international`.
   - **Copy** is offered only on `failed`, `expired`, `cancelled`, `not_placed` and `abandoned`.
   - It copies the number the member already sees on the Lead.
 
@@ -451,7 +514,8 @@ A file-backed store `web_call_requests.json` lives in the partition folder, next
      - several → a picker, defaulting to the last used in this browser;
      - not-ready phones are disabled, with their reason and "last reported".
    - The action is greyed out with a reason when there's no ready phone, no number, Do Not Call,
-     a non-international number (decision 5), the feature is off, or the member lacks `call.log`.
+     a number without an international form ("Set your organization's dialling country to call
+     this number"), the feature is off, or the member lacks `call.log`.
 2. **Call card:** in the CRM shell, minimizable, kept across navigation.
    - Draggable, with arrow-key moves (WCAG 2.5.7) and `aria-live` status, reusing the sticky-notes
      code.
@@ -460,15 +524,28 @@ A file-backed store `web_call_requests.json` lives in the partition folder, next
 
    | State | Card text |
    |---|---|
-   | `requested` | "Sending to *Pixel 8*…" |
-   | `sent` | "Sent to *Pixel 8*. Tap the notification on your phone" (with `delivery_unconfirmed`: "Sending may not have completed") |
-   | `sent` + 30 s | "Your phone hasn't responded yet" |
-   | `opened` | "Opening the dialer on your phone…" |
-   | `dialing` | "Call in progress on your phone · 00:42 (includes ringing)" |
-   | `needs_log` | "Call finished. Log the outcome" |
-   | `outcome_unknown` | "We didn't hear back from your phone. Log the call if you made it" |
-   | `failed(device_not_ready)` | "This phone isn't ready: notifications are off (last reported 10:42)" |
-   | other final states | Their own plain words |
+   **Truthful-wording rule:** each text claims only what the state proves. "Sent" means handed to
+   the push service, never "delivered". "Call" claims come only from the phone's own report.
+   Nothing says "answered" or "connected".
+
+   | State | Card text (what it proves) |
+   |---|---|
+   | `requested` | "Sending a request to *Pixel 8*…" |
+   | `sent` | "Request sent to *Pixel 8*. Open the notification on your phone." |
+   | `sent`, `delivery_unconfirmed` | "We couldn't confirm the request reached *Pixel 8*. Check your phone." |
+   | `sent` + 30 s | "*Pixel 8* hasn't opened the request yet." |
+   | `opened` | "Opened on *Pixel 8*. Confirm the call in your phone's dialer." |
+   | `dialing` | "Your phone reports a call in progress · 00:42 (time includes ringing)" |
+   | `needs_log` | "Your phone reports the call ended. Log the outcome." With `tracking = untracked`: "Your phone couldn't track this call. Log it if you made it." |
+   | `outcome_unknown` | "Your phone hasn't reported how this went. Log the call if you made it." |
+   | `not_placed` | "No call was placed from your phone." |
+   | `failed(dialer_unavailable)` | "Your phone couldn't open its dialer." |
+   | `failed(device_not_ready)` | "*Pixel 8* isn't ready for calls from the web (last reported 10:42): notifications are off." |
+   | `failed(push_unavailable)` / `expired` | "The request wasn't opened in time." |
+   | `refused(do_not_call)` | "This number is on the Do Not Call list." |
+   | `refused(number_changed)` | "The number changed, so the request was stopped." |
+   | `cancelled` | "Request cancelled." |
+   | `logged` | "Call logged." |
 
    - **Actions:**
      - **Cancel** (`requested`/`sent`);
@@ -499,6 +576,21 @@ Merge requests 3 and 4 can start once #2's contract is merged. **Rollout:**
 - The tenant switch stays off until the new app is live.
 - Old apps never register, so they are never eligible.
 - Switching it off hides the action. Existing calling and logging are untouched.
+
+### 5.1 Targeted tests for the 2026-11-08 corrections
+Added to the gates of merge requests #1 and #2.
+
+| Correction | Test |
+|---|---|
+| `requested` expires | A request whose workflow never runs (intent not drained) is read as `expired` once past `expires_at`. The next create by the same member **expires it in place and succeeds** without waiting for the backstop. The backstop job moves it to `expired(push_unavailable)` |
+| `requested` expires after permanent workflow failure | A workflow raising on every attempt leaves the row `requested`. After `expires_at`, open → 409 `expired`, create frees the slot, and the backstop expires it |
+| Activity link and lifecycle | Logging sets `logged`; the join returns the Activity. Deleting a `phone_call_requests` row that has an Activity is refused (`RESTRICT`). A superuser `DELETE` of the Activity (simulating a future path) cascades `activity_calls` and leaves the request `logged`, with a read model of "Activity no longer available". No reverse FK exists |
+| National format never bypasses suppression | Tenant with no dialling plan, contact point stored national → create returns 409 `number_not_international` even when an E.164 suppression for the same subscriber exists. Copy is not allowed. After a dialling country is set, the same contact point normalizes to E.164; a live suppression → `do_not_call`; no suppression → accepted |
+| `consent_required` doesn't block | Under `opt_in_required` with no consent row, create is accepted (a person-to-person call, not marketing) |
+| `lead_id` in open | The open response carries `lead_id` equal to the request's Lead. `logCall` with a context of another Lead and this request is refused |
+| Durable event dedup | The same `event_id` posted twice, then again after the process and connection pool restart → one `phone_call_request_events` row, one transition. A concurrent duplicate post → one row (the PK), the other gets 204. A valid event with no transition is stored `applied = false` and never applied later |
+| FCM TTL and collapse | The Platform push body has `ttl` = seconds to `expires_at` (frozen per attempt), `collapse_key = reference_id` and `android.notification.tag = reference_id`. A same-key retry sends an identical body (no 409) |
+| Truthful wording | Web unit test: each state renders the §4 text. A string list check fails if "delivered", "answered" or "connected" appear in the catalogue |
 
 ## 6. Real-device checklist (gate for #3)
 
@@ -532,11 +624,9 @@ All on a Samsung phone and a Xiaomi/HyperOS phone:
 2. Two taps (`ACTION_DIAL`).
 3. A picker when there are several ready phones; never switch phones automatically.
 4. Personal SIM use only behind the tenant switch, with the disclosure.
-5. **New:** numbers stored without an international prefix (tenants with no dialling plan). Should
-   they be callable from the phone (the SIM dials national numbers) while still checked against
-   suppression, or blocked as `number_not_international` until the tenant sets a dialling plan?
-   *Recommended:* allow, with suppression checked on the stored value, because the phone app's own
-   Call button already dials them.
+5. ~~National numbers~~: **resolved by the owner (2026-11-08).** They are blocked as
+   `number_not_international` until a dialling country is configured. Suppression is never bypassed
+   (§2.8).
 
 ## 8. Review findings and how they were resolved
 
