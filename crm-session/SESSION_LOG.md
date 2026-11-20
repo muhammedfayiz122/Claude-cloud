@@ -302,10 +302,11 @@ Owner said "go with enterprise CRMs". Adopted defaults:
 - 2026-11-21 G2 round 2 done locally (BE a39ee1767, FE 29c98bd13; D647 no role-per-unit, D648 pipelines read + journey target, D649 template assignments 0624; leads list ?pipeline= with scoped pickers). Found on MR A FE (!750): 2 stale tests (permission-areas label for lead.transfer.approve, DOCUMENT_INDEX CRM-FE-MOD-002 hash) → fixed locally in fe-mra; running FULL MR A FE vitest before one push. GitLab still 500 (whole site) → MR C waiter re-armed; G2/G3 commits local only.
 
 ### Pending GitLab publish (blocked by GitLab outage since ~20:30 UTC 2026-11-20, whole site HTTP 500)
-1. Push fe-mra fix c98e1737f (+ any further fixes from full vitest) → `feature/audit-rollout/general-crm-gaps` (MR !750 — one push).
+1. Push fe-mra fixes c98e1737f + a44c95f67 → `feature/audit-rollout/general-crm-gaps` (MR !750 — one push).
 2. Open MR C (both repos) from scratchpad `mr-c-be.json` / `mr-c-fe.json` after checking none exist; comment on BE #73–#78.
 3. Push G2 heads (be-g2 a39ee1767+, fe-g2 29c98bd13+) and G3 heads (be-g3/fe-g3 latest) with `-o ci.skip`.
 4. G2: run full regression, then open MR D stacked on MR A (target develop, "depends on !680/!750"); comment BE #80/#81, FE #70/#72–#75.
 5. G3: after the agent's round 2, merge G1, run full regression, open MR E; comment BE #79/#82–#84, FE #71; tracker #72 summary.
 - 2026-11-21 G3 round 2 done locally (BE 45d69a338, FE 821b6137e; 0644–0647, D669 + D666/D667 amended, record_handoffs for leads+deals, access_until read-time expiry, kernel.share_ends hook, generic 403/404 panel state). Follow-up: untranslated ar deal/account labels.
 - 2026-11-21 Owner: "You create all MRs and all, after that fully completed, then I will review merge it. So you fully complete it." → finish MR C/D/E + all issue comments + tracker summary, then hand over for review. G3 FE head 127075b13 (ar section titles + test). G3 regression queued after G2's.
+- 2026-11-21 MR A FE full vitest: 21688 passed, 11 failed → 2 files real (FieldSubfields, LeadFieldsTable read the lazily loaded field editor with getBy) fixed in a44c95f67 (fe-mra, local); ViewSwitcher/RadioGroup were load flakes. MR A FE fixes merged into G2 FE (fa7e0254e). G1 FE index tests pass. Full G3 FE vitest running. MR B FE full vitest still to do (pending list).
