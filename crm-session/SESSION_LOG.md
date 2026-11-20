@@ -256,3 +256,17 @@ the WP5 gap-closing round, and all of G1 (its branch was never pushed). They are
 
 ### Progress
 - (updated as packages finish)
+
+### Enterprise-research decisions (2026-11-20; detail in `crm-session/RESEARCH.md`)
+Owner said "go with enterprise CRMs". Adopted defaults:
+1. WP1 Q1 — customer lent through a person field: header read-only + only items attached to the granting record; per field-definition setting `None` (default) / `Customer activities & notes (read)`.
+2. WP1 Q2 — task holder: sees the task plus the parent's and customer's names only; tenant setting "Task assignees may read customer header" (off by default).
+3. WP1 Q3 — "Keep access" creates an independent manual share beside the field-derived one; the access panel lists every reason.
+4. WP1 Q4 — narrow member lookup (id, name, avatar, active, title/department) for all internal members; setting `All members` (default) / `Department + hierarchy`.
+5. Lead name precedence: template/custom title → primary contact name → company → "Lead #N"; subtitle "contact · company"; search matches all; per-pipeline switch.
+6. Bulk transfer: preflight grouped by pipeline, reason once per pipeline group, per-record transactions + result report + "Retry failed"; `atomic=true` API flag.
+7. G3 presets: Collaborative (default) / Private / Strict; customer identity always shared (one master); Strict = unit sees a customer only with work on it, cross-unit grants need approval.
+8. Sales orders: copy header + all lines, lock + link proposal; recurring lines keep term/frequency; payments partial; credit = owner 100% default.
+
+### Progress
+- 2026-11-20 MR A merged with develop: BE 6e4075429 pushed (0520 re-chained on 0517; dropped bogus compat bump — fingerprint unchanged under py3.12; D600 §3 corrected). Unit suite 13547 passed (fingerprint test only fails under py3.13 = expected). Rehearsal gate 340 passed.
