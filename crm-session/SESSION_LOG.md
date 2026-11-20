@@ -308,3 +308,4 @@ Owner said "go with enterprise CRMs". Adopted defaults:
 4. G2: run full regression, then open MR D stacked on MR A (target develop, "depends on !680/!750"); comment BE #80/#81, FE #70/#72–#75.
 5. G3: after the agent's round 2, merge G1, run full regression, open MR E; comment BE #79/#82–#84, FE #71; tracker #72 summary.
 - 2026-11-21 G3 round 2 done locally (BE 45d69a338, FE 821b6137e; 0644–0647, D669 + D666/D667 amended, record_handoffs for leads+deals, access_until read-time expiry, kernel.share_ends hook, generic 403/404 panel state). Follow-up: untranslated ar deal/account labels.
+- 2026-11-21 Owner: "You create all MRs and all, after that fully completed, then I will review merge it. So you fully complete it." → finish MR C/D/E + all issue comments + tracker summary, then hand over for review. G3 FE head 127075b13 (ar section titles + test). G3 regression queued after G2's.
