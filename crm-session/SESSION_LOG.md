@@ -270,3 +270,5 @@ Owner said "go with enterprise CRMs". Adopted defaults:
 
 ### Progress
 - 2026-11-20 MR A merged with develop: BE 6e4075429 pushed (0520 re-chained on 0517; dropped bogus compat bump — fingerprint unchanged under py3.12; D600 §3 corrected). Unit suite 13547 passed (fingerprint test only fails under py3.13 = expected). Rehearsal gate 340 passed.
+- 2026-11-20 G1 round 1 pushed: BE `feature/governance/multi-unit-isolation-verified` 6f93bd2a3 (D620–D624; isolation matrix 37 surfaces × 6 people, governed + legacy; service record graph tests). Leaks fixed: notifications exposing out-of-reach record ids (D622), spoofable process context (D623); over-restrictive reads aligned (D620, D621, D624). FE: no change needed. Round 2 running: #77 confidential Lead fields + approval-policy publish warning.
+  Open for owner: `proposal_commands_of_mr_524` flip (evidence: governed command tests 34/34); legacy proposal files gated by document.read only (suggest extending gated record rule to proposals); unit members cannot use the inbox (mailbox keys org-wide, fail-closed).
