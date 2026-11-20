@@ -307,3 +307,4 @@ Owner said "go with enterprise CRMs". Adopted defaults:
 3. Push G2 heads (be-g2 a39ee1767+, fe-g2 29c98bd13+) and G3 heads (be-g3/fe-g3 latest) with `-o ci.skip`.
 4. G2: run full regression, then open MR D stacked on MR A (target develop, "depends on !680/!750"); comment BE #80/#81, FE #70/#72–#75.
 5. G3: after the agent's round 2, merge G1, run full regression, open MR E; comment BE #79/#82–#84, FE #71; tracker #72 summary.
+- 2026-11-21 G3 round 2 done locally (BE 45d69a338, FE 821b6137e; 0644–0647, D669 + D666/D667 amended, record_handoffs for leads+deals, access_until read-time expiry, kernel.share_ends hook, generic 403/404 panel state). Follow-up: untranslated ar deal/account labels.
