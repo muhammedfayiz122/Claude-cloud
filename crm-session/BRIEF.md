@@ -73,3 +73,9 @@ pick the enterprise-standard default, record it as a decision (D-number) and lis
 - Verified in browser vs. unit-tested only vs. not checked.
 - Decisions taken on the owner's behalf (with the enterprise reference).
 - Anything left open, with reason.
+
+## Resource tips (learned 2026-11-20)
+- Node runs out of heap on `pnpm typecheck` / `pnpm lint` while other agents run: prefix `NODE_OPTIONS=--max-old-space-size=6144`.
+- Tests that start their own containers expect `postgres:16-alpine` etc.; these are tagged locally from mirror.gcr.io (Docker Hub rate-limits us). Never `docker pull` from Docker Hub.
+- The compat fingerprint test (`tests/unit/durable/test_compat_fingerprint.py`) must be computed under Python 3.12:
+  `UV_PROJECT_ENVIRONMENT=/home/user/tools/venv312 uv run --python 3.12 pytest tests/unit/durable/test_compat_fingerprint.py -q`. Under 3.13 it always fails — ignore that.
