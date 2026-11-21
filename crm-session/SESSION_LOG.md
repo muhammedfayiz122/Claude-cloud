@@ -326,3 +326,11 @@ Owner said "go with enterprise CRMs". Adopted defaults:
 | D G2 process selection | !684 | !754 | stacked on A | BE #80, #81; FE #70, #72–#75 |
 | E G3 presets/handoffs | !685 | !755 | stacked on C | BE #79, #82–#84; FE #71 |
 Merge order: A, C, then B, D, E. COMPAT_VERSION 30 on both A and E → bump on the second merge. MR B release step: backfill-record-contexts + verify-record-contexts per org (deploy/README.md §6.1).
+
+## 14. Round "fully complete" (owner, 2026-11-21: "when there is gaps, how can we say completed, fully complete it" + new issues)
+New issues since 2026-11-20 (not yet handled): BE #85 (completion evidence/approver availability), #86 (manager approval for reassignment/field changes), #87 (required deadlines unset); FE #76 (Edit Lead save after customized form), #77 (automation run step labels), #78 (Arabian Sky dashboards from reference HTML — needs the HTML from owner).
+Agents (branches merged into the existing MRs afterwards, one push per MR — no new MRs):
+- FU1 `fix/audit-rollout/followups` (→ MR A): #85, #87, FE #76, #77, Arabic refusal messages, D557 rules settings screen, transfer-all retry browser check. 0543–0545, D650–D654, DB crm_fu1 8090/5290.
+- FU2 `feature/audit-rollout/change-approval` (→ MR A): #86. 0546–0549, D655–D659, DB crm_fu2 8095/5295.
+- FU3 `fix/governance/g1-followups` (→ MR C) + `fix/governance/g3-followups` (→ MR E): scoring editor all condition kinds, legacy proposal files gate, approval empty-approver warning, routing/duplicate refusal browser checks; approver fan-out, service participants + handoffs, responsibility read for share-only readers. D670–D679, 0648–0649.
+Still to do by coordinator: MR B — open order follows proposal/opportunity responsibility transfer; permission labels for sales_order/payment.configure (catalogue lives on MR A → stack MR B on MR A or add labels at merge); D557 for Leads/Opportunities (owner decision asked); FE #78 (HTML asked).
