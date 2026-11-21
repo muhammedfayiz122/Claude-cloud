@@ -315,3 +315,14 @@ Owner said "go with enterprise CRMs". Adopted defaults:
 - 2026-11-21 MR B FE full vitest 21621/21621 ✓. G3 BE regression: gates 2475, isolation 3471, contract 142, .claude 1232 ✓; unit 1 real (handoff operations not in published-actions registry) → G3 agent after integration ends.
 - 2026-11-21 **MR E OPENED** (stacked on MR C): crm-backend !685, crm-frontend !755; comments BE #79/#82–#84, FE #71; **tracker #72 summary posted** (all workspace issues → MR C/D/E). Before: G3 published-actions fix (BE 4fc6fe92e, FE 6c73c7c3f), build/budgets 679 ✓.
 - CI review of all MR pipelines: develop itself fails test:system (timeouts) and FE test:snapshot-renderer + unit shards (SettingsWorkspace etc. under runner load) → same classes on our MRs are pre-existing runner issues; every FE test failing in CI passed in local full runs. **Real bug found by CI:** verify:backup-restore — db/schema.sql forward FK references (MR A page_layout_pipelines → pipeline_definitions; G2 page_layout_targets/page_template_assignments → business_contexts/pipeline_definitions). Fixed with ALTER TABLE after pipeline_definitions under the migration-given names (MR A 9c65f6c91 → !680; merged into G2 + G2 fix dc50b14cd → !684). Local tool /home/user/tools/schema-forward-refs.py + schema-apply-check.sh: all 5 backend branches now apply schema.sql on an empty DB. !683 verify:image = image-pull flake (selector works locally) → job retried. Gotenberg determinism failure on !680 passes locally (renderer-level).
+- 2026-11-21 01:31 CI confirms: verify:backup-restore ✓ on !680 (9c65f6c91) and !684 (dc50b14cd); upgrade-rehearsal ✓; verify:image ✓ on !683 (retried) and !684. **All five MR pairs open, all issues commented, tracker #72 summarised → handed to owner for review.** Remaining red jobs are the runner classes develop itself shows (test:system timeouts, FE snapshot-renderer, load-sensitive unit shards).
+
+## 13. Hand-over (2026-11-21)
+| MR | Backend | Frontend | Base | Issues |
+|---|---|---|---|---|
+| A general-CRM gaps (WP1–4, 2b) | !680 | !750 | develop | BE #50–#55, #57–#67; FE #54–#65 |
+| B sales orders + payments | !682 | !752 | develop | BE #56 |
+| C G1 isolation | !683 | !753 | develop | BE #73–#78 |
+| D G2 process selection | !684 | !754 | stacked on A | BE #80, #81; FE #70, #72–#75 |
+| E G3 presets/handoffs | !685 | !755 | stacked on C | BE #79, #82–#84; FE #71 |
+Merge order: A, C, then B, D, E. COMPAT_VERSION 30 on both A and E → bump on the second merge. MR B release step: backfill-record-contexts + verify-record-contexts per org (deploy/README.md §6.1).
